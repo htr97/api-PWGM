@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Data;
+using Interfaces;
+using Services;
 
 namespace backend
 {
@@ -27,12 +29,14 @@ namespace backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ITokenService, TokenService>();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
             });
 
             services.AddControllers();
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "backend", Version = "v1" });
@@ -52,6 +56,8 @@ namespace backend
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
 
             app.UseAuthorization();
 

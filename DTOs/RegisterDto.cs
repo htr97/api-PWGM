@@ -1,30 +1,18 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Entities
+namespace DTOs
 {
-    public class AppUser
+    public class RegisterDto
     {
-         public int Id { get; set; }
-
         [Required]
         public string UserName{ get; set; }
-
         [Required]
-        [StringLength(50)]
+        [EmailAddress]
         public string Email { get; set; }
-
-        [StringLength(75)]
         public string Country { get; set; }
-
-        [StringLength(100)]
         public string Company { get; set; }
-
-        [StringLength(15)]
         public string Telephone { get; set; }
-
         [Required]
-        public byte[] PasswordHash { get; set; }
-        [Required]
-        public byte[] PasswordSalt { get; set; }
+        public string Password { get; set; }
     }
 }
