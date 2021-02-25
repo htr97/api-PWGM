@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Extensions;
 
 namespace Entities
 {
@@ -8,6 +11,8 @@ namespace Entities
 
         [Required]
         public string UserName{ get; set; }
+        [Required]
+        public DateTime DateofBirth { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -26,5 +31,13 @@ namespace Entities
         public byte[] PasswordHash { get; set; }
         [Required]
         public byte[] PasswordSalt { get; set; }
+
+        public DateTime Created { get; set; } = DateTime.Now;
+        public string Photo { get; set; }
+
+        public int GetAge()
+        {
+            return DateofBirth.Calculateage();
+        }
     }
 }
