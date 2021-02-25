@@ -12,5 +12,7 @@ namespace Data
         public DbSet<AppUser> Users {get; set;}
         public DbSet<MaintenanceType> MaintenanceTypes {get; set;}
         public DbSet<Problem> Problems {get; set;}
+        public DbSet<Ubication> Ubications {get; set;}
+        public DbSet<Company> Companies {get; set;}
     }
 }
