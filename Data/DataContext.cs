@@ -14,5 +14,8 @@ namespace Data
         public DbSet<Problem> Problems {get; set;}
         public DbSet<Ubication> Ubications {get; set;}
         public DbSet<Company> Companies {get; set;}
+        public DbSet<Priority> Priorities {get; set;}
+        public DbSet<Maintenance> Maintenances {get; set;}
+        public DbSet<Equipment> Equipments { get; set; }
     }
 }

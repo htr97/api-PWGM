@@ -4,14 +4,16 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace backend.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210226030551_Company-address")]
+    partial class Companyaddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,7 +175,7 @@ namespace backend.Data.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("TechnicianId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -186,7 +188,7 @@ namespace backend.Data.Migrations
 
                     b.HasIndex("ProblemId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TechnicianId");
 
                     b.ToTable("Maintenances");
                 });
@@ -252,6 +254,28 @@ namespace backend.Data.Migrations
                     b.ToTable("Problems");
                 });
 
+            modelBuilder.Entity("Entities.Technician", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Technicians");
+                });
+
             modelBuilder.Entity("Entities.Ubication", b =>
                 {
                     b.Property<int>("Id")
@@ -314,9 +338,9 @@ namespace backend.Data.Migrations
                         .WithMany()
                         .HasForeignKey("ProblemId");
 
-                    b.HasOne("Entities.AppUser", "User")
+                    b.HasOne("Entities.Technician", "Technician")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("TechnicianId");
 
                     b.Navigation("Equipment");
 
@@ -326,7 +350,18 @@ namespace backend.Data.Migrations
 
                     b.Navigation("Problem");
 
-                    b.Navigation("User");
+                    b.Navigation("Technician");
+                });
+
+            modelBuilder.Entity("Entities.Technician", b =>
+                {
+                    b.HasOne("Entities.Company", "Company")
+                        .WithMany("Technicians")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Entities.Ubication", b =>
@@ -343,6 +378,8 @@ namespace backend.Data.Migrations
             modelBuilder.Entity("Entities.Company", b =>
                 {
                     b.Navigation("AppUsers");
+
+                    b.Navigation("Technicians");
 
                     b.Navigation("Ubications");
                 });

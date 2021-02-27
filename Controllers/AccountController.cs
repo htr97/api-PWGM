@@ -28,18 +28,25 @@ namespace Controllers
 
             using var hmac = new HMACSHA512();
 
+             var company = new Company{
+                Name = registerDto.Company
+            };
+            _context.Companies.Add(company);
+            await _context.SaveChangesAsync();            
+
             var user = new AppUser
             {
                 UserName = registerDto.UserName,
                 Email = registerDto.Email.ToLower(),
                 Country = registerDto.Country,
-                Company = registerDto.Company,
+                //Company = registerDto.Company,
                 Telephone = registerDto.Telephone,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-                PasswordSalt = hmac.Key
+                PasswordSalt = hmac.Key,
+                CompanyId = company.Id
             };
-
             _context.Users.Add(user);
+
             await _context.SaveChangesAsync();
 
             return new UserDto

@@ -21,9 +21,6 @@ namespace Entities
         [StringLength(75)]
         public string Country { get; set; }
 
-        [StringLength(100)]
-        public string Company { get; set; }
-
         [StringLength(15)]
         public string Telephone { get; set; }
 
@@ -34,6 +31,8 @@ namespace Entities
 
         public DateTime Created { get; set; } = DateTime.Now;
         public string Photo { get; set; }
+        public Company Company {get; set;}
+        public int CompanyId {get; set;}
 
         public int GetAge()
         {
