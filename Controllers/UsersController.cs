@@ -23,11 +23,13 @@ namespace Controllers
             return await _context.Users.ToListAsync();
         }
 
-        //api/users/id
+        //api/users/email
         [Authorize]
-        [HttpGet("{id}")]
+        [HttpGet("{email}")]
         public async Task<ActionResult<AppUser>> GetUser(int id){
             return await _context.Users.FindAsync(id);
         }
+
+
     }
 }
