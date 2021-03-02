@@ -20,6 +20,10 @@ namespace DTOs
 
         [Required]
         [MaxLength (25)]
+        public string StorageCap { get; set; }
+
+        [Required]
+        [MaxLength (25)]
         public string Processor { get; set; }
 
         [Required]

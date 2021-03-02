@@ -36,7 +36,8 @@ namespace Controllers
         [HttpPost]
         public async Task<bool> PostEquipment(EquipmentDto equipmentDto)
         {
-            if (await UbicationExists(equipmentDto.Ubication,equipmentDto.CompanyId)== true)
+            
+            if (await UbicationExists(equipmentDto.Ubication,equipmentDto.CompanyId) == true)
             {
                 var ubication = new Ubication
                 {
@@ -47,16 +48,21 @@ namespace Controllers
                 _context.Ubications.Add(ubication);
                 await _context.SaveChangesAsync();
             }
+            
+            var uid = await _context.Ubications.Where(u => u.CompanyId == equipmentDto.CompanyId && u.Name.ToLower() == equipmentDto.Ubication.ToLower()).FirstAsync();
+
 
             var equipment = new Equipment
                 {
                     DeviceName = equipmentDto.DeviceName,
                     SystemType = equipmentDto.SystemType,
                     StorageType = equipmentDto.StorageType,
+                    StorageCap = equipmentDto.StorageCap,
                     Processor = equipmentDto.Processor,
                     Memory = equipmentDto.Memory,
                     OsName = equipmentDto.OsName,
-                    Observation = equipmentDto.Observation
+                    Observation = equipmentDto.Observation,
+                    UbicationId = uid.Id
                 };
 
                 _context.Equipments.Add(equipment);
@@ -101,6 +107,10 @@ namespace Controllers
         private async Task<bool> UbicationExists(string ubication, int company){
             return await _context.Ubications.FromSqlRaw("SELECT * FROM dbo.Ubications WHERE LOWER(Name) = LOWER('{0}') and CompanyId = {1}",ubication, company).AnyAsync();
         }
+
+        // private async Task<List<Ubication>> GetUbication(string ubication, int company){
+        //     return await _context.Ubications.Where(u => u.CompanyId == company && u.Name.ToLower() == ubication.ToLower()).FirstAsync();
+        // }
 
         private async Task<bool> EquipmentExists(int id){
             return await _context.Equipments.AnyAsync(x => x.Id == id);

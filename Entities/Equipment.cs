@@ -21,6 +21,10 @@ namespace Entities
 
         [Required]
         [MaxLength (25)]
+        public string StorageCap { get; set; }
+
+        [Required]
+        [MaxLength (25)]
         public string Processor { get; set; }
 
         [Required]
@@ -35,6 +39,7 @@ namespace Entities
         [MaxLength (160)]
         public string Observation { get; set; }
         public Ubication Ubication { get; set; }
+        public int UbicationId { get; set; }
 
         public ICollection<Maintenance> Maintenances { get; set; }
     }
