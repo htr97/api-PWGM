@@ -21,15 +21,13 @@ namespace Controllers
         [AllowAnonymous]
         [HttpGet]
         public async Task<List<UbicationDto>> GetUbication(){
-            var result = await (from u in _context.Ubications join c in _context.Companies on u.CompanyId equals c.Id select new UbicationDto { Id = u.Id, Name = u.Name, CompanyId = c.Id , Company = c.Name}).ToListAsync().ConfigureAwait(false);
-            return result;
+            return await (from u in _context.Ubications join c in _context.Companies on u.CompanyId equals c.Id select new UbicationDto { Id = u.Id, Name = u.Name, CompanyId = c.Id , Company = c.Name}).ToListAsync().ConfigureAwait(false);
         }
 
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<List<UbicationDto>> GetUbicationByCompany(int id){
-            var result = await (from u in _context.Ubications join c in _context.Companies on u.CompanyId equals c.Id where c.Id == id select new UbicationDto { Id = u.Id, Name = u.Name, CompanyId = c.Id , Company = c.Name}).ToListAsync().ConfigureAwait(false);
-            return result;
+            return await (from u in _context.Ubications join c in _context.Companies on u.CompanyId equals c.Id where c.Id == id select new UbicationDto { Id = u.Id, Name = u.Name, CompanyId = c.Id , Company = c.Name}).ToListAsync().ConfigureAwait(false);
         }
         
     }
