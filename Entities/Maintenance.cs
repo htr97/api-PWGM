@@ -16,10 +16,12 @@ namespace Entities
         [MaxLength(160)]
         public string Description { get; set; }
         public MaintenanceType MaintenanceType { get; set; }
+        public int MaintenanceTypeId { get; set; }
         public Priority Priority { get; set;}
+        public int PriorityId { get; set;}
         public AppUser User { get; set; }
         public Problem Problem { get; set; }
-
+        public int ProblemId { get; set; }
         public Equipment Equipment {get; set;}
         public int EquipmentId { get; set; }
     }

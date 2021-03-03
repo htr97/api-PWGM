@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,12 +29,16 @@ namespace Controllers
 
             using var hmac = new HMACSHA512();
 
-             var company = new Company{
-                Name = registerDto.Company
-            };
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();            
+            if (await CompanyExists(registerDto.Company) == true)
+            {
+                var company = new Company{
+                    Name = registerDto.Company
+                };
+                _context.Companies.Add(company);
+                await _context.SaveChangesAsync();            
+            }
 
+            var c = await _context.Companies.Where(x => x.Name.ToLower() == registerDto.Company.ToLower()).FirstAsync();
             var user = new AppUser
             {
                 UserName = registerDto.UserName,
@@ -43,7 +48,7 @@ namespace Controllers
                 Telephone = registerDto.Telephone,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
                 PasswordSalt = hmac.Key,
-                CompanyId = company.Id
+                CompanyId = c.Id
             };
             _context.Users.Add(user);
 
@@ -80,6 +85,10 @@ namespace Controllers
         private async Task<bool> EmailExists(string email)
         {
             return await _context.Users.AnyAsync(x => x.Email == email.ToLower());
+        }
+
+        private async Task<bool> CompanyExists(string company){
+            return await _context.Ubications.FromSqlRaw("SELECT * FROM dbo.Companies WHERE LOWER(Name) = LOWER('{0}')",company).AnyAsync();
         }
     }
 }

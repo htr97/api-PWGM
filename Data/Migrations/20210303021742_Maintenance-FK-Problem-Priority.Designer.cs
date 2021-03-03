@@ -4,14 +4,16 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace backend.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210303021742_Maintenance-FK-Problem-Priority")]
+    partial class MaintenanceFKProblemPriority
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,7 +168,7 @@ namespace backend.Data.Migrations
                     b.Property<int>("EquipmentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaintenanceTypeId")
+                    b.Property<int?>("MaintenanceTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("PriorityId")
@@ -311,9 +313,7 @@ namespace backend.Data.Migrations
 
                     b.HasOne("Entities.MaintenanceType", "MaintenanceType")
                         .WithMany()
-                        .HasForeignKey("MaintenanceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MaintenanceTypeId");
 
                     b.HasOne("Entities.Priority", "Priority")
                         .WithMany()
