@@ -20,6 +20,7 @@ namespace Entities
         public Priority Priority { get; set;}
         public int PriorityId { get; set;}
         public AppUser User { get; set; }
+        public int UserId { get; set; }
         public Problem Problem { get; set; }
         public int ProblemId { get; set; }
         public Equipment Equipment {get; set;}

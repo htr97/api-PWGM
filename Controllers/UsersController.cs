@@ -27,8 +27,8 @@ namespace Controllers
         //api/users/email
         [AllowAnonymous]
         [HttpGet("{email}")]
-        public async Task<ActionResult<AppUser>> GetUser(int id){
-            return await _context.Users.FindAsync(id);
+        public async Task<ActionResult<AppUser>> GetUser(string email){
+            return await _context.Users.FromSqlRaw("SELECT * FROM dbo.Users WHERE Email = ('{0}')", email).FirstOrDefaultAsync();
         }
 
         [AllowAnonymous]
@@ -47,7 +47,7 @@ namespace Controllers
             }
 
             var entity = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
-            entity.UserName = user.UserName;
+            //entity.UserName = user.UserName;
             entity.Email = user.Email;
             entity.DateofBirth = user.DateofBirth;
             entity.Country = user.Country;

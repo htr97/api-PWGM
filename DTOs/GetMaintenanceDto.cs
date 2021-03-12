@@ -5,6 +5,7 @@ namespace DTOs
 {
     public class GetMaintenanceDto
     {
+        public int Id { get; set; }
         [Required]
         [MaxLength (25)]
         public string DeviceName { get; set; }

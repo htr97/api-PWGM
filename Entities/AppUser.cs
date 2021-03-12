@@ -10,7 +10,16 @@ namespace Entities
          public int Id { get; set; }
 
         [Required]
+        [StringLength(25)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(25)]
+        public string LastName { get; set; }
+
+        [Required]
         public string UserName{ get; set; }
+
         [Required]
         public DateTime DateofBirth { get; set; }
 
@@ -23,6 +32,10 @@ namespace Entities
 
         [StringLength(15)]
         public string Telephone { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string Title { get; set; }
 
         [Required]
         public byte[] PasswordHash { get; set; }

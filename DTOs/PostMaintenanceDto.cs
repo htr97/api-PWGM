@@ -10,7 +10,7 @@ namespace DTOs
         public string Description { get; set; }  
         public int MaintenanceTypeId { get; set; }
         public int PriorityId { get; set; }
-        public int UserId { get; set; }
+        public string UserEmail { get; set; }
         public int ProblemId { get; set; }
         public int EquipmentId { get; set; }
         

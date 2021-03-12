@@ -4,7 +4,6 @@ namespace DTOs
 {
     public class EquipmentDto
     {
-        public int Id { get; set; }
 
         [Required]
         [MaxLength (25)]
@@ -40,6 +39,6 @@ namespace DTOs
 
         public string Ubication { get; set; }
 
-        public int CompanyId { get; set; }
+        public string UserEmail { get; set; }
     }
 }

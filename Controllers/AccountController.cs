@@ -29,7 +29,7 @@ namespace Controllers
 
             using var hmac = new HMACSHA512();
 
-            if (await CompanyExists(registerDto.Company) == true)
+            if (!await CompanyExists(registerDto.Company))
             {
                 var company = new Company{
                     Name = registerDto.Company
@@ -41,11 +41,13 @@ namespace Controllers
             var c = await _context.Companies.Where(x => x.Name.ToLower() == registerDto.Company.ToLower()).FirstAsync();
             var user = new AppUser
             {
-                UserName = registerDto.UserName,
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName,
+                UserName = registerDto.FirstName + " " + registerDto.LastName,
                 Email = registerDto.Email.ToLower(),
                 Country = registerDto.Country,
-                //Company = registerDto.Company,
                 Telephone = registerDto.Telephone,
+                Title = registerDto.Title,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
                 PasswordSalt = hmac.Key,
                 CompanyId = c.Id

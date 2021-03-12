@@ -25,10 +25,10 @@ namespace Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Equipment>>> GetEquipmentsByCompany(int id){
+        [HttpGet("{email}")]
+        public async Task<ActionResult<IEnumerable<Equipment>>> GetEquipmentsByCompany(string email){
             
-            var equipments = await _context.Equipments.FromSqlRaw("SELECT * FROM dbo.Equipments WHERE UbicationId IN (SELECT Id FROM dbo.Ubications WHERE CompanyId = {0})",id).ToListAsync();
+            var equipments = await _context.Equipments.FromSqlRaw("SELECT e.* FROM dbo.Equipments e INNER JOIN dbo.Ubications u on e.UbicationId = u.Id INNER JOIN dbo.Companies c on u.CompanyId = c.Id WHERE c.Id = (SELECT ur.CompanyId FROM dbo.Users ur WHERE LOWER(ur.Email)  = LOWER({0}))",email).ToListAsync();
             return equipments;
         }
 
@@ -37,20 +37,22 @@ namespace Controllers
         public async Task<bool> PostEquipment(EquipmentDto equipmentDto)
         {
             
-            if (await UbicationExists(equipmentDto.Ubication,equipmentDto.CompanyId) == true)
+            if (await UbicationExists(equipmentDto.Ubication,equipmentDto.UserEmail) != true)
             {
+                var email = await _context.Users.Where(u => u.Email.ToLower() == equipmentDto.UserEmail.ToLower()).FirstAsync();
+
                 var ubication = new Ubication
                 {
                     Name = equipmentDto.Ubication,
-                    CompanyId = equipmentDto.CompanyId
+                    CompanyId = email.CompanyId
                 };
 
                 _context.Ubications.Add(ubication);
                 await _context.SaveChangesAsync();
             }
             
-            var uid = await _context.Ubications.Where(u => u.CompanyId == equipmentDto.CompanyId && u.Name.ToLower() == equipmentDto.Ubication.ToLower()).FirstAsync();
-
+            // var uid = await  _context.Ubications.FromSqlRaw("SELECT ub.Id, ub.CompanyId, ub.Name FROM dbo.Ubications ub inner join PWGM.dbo.Users u on ub.CompanyId = u.CompanyId WHERE LOWER(ub.Name) = LOWER('{0}') and LOWER(u.Email) = LOWER({1})",equipmentDto.Ubication, equipmentDto.UserEmail).FirstAsync();
+            var uid = await (from ub in _context.Ubications join u in _context.Users on ub.CompanyId equals u.CompanyId where ub.Name.ToLower() == equipmentDto.Ubication.ToLower() && u.Email.ToLower() == equipmentDto.UserEmail.ToLower() select new { ub.Id, ub.CompanyId, ub.Name}).FirstOrDefaultAsync().ConfigureAwait(false);
 
             var equipment = new Equipment
                 {
@@ -104,13 +106,9 @@ namespace Controllers
         }
 
 
-        private async Task<bool> UbicationExists(string ubication, int company){
-            return await _context.Ubications.FromSqlRaw("SELECT * FROM dbo.Ubications WHERE LOWER(Name) = LOWER('{0}') and CompanyId = {1}",ubication, company).AnyAsync();
+        private async Task<bool> UbicationExists(string ubication, string email){
+            return await (from ub in _context.Ubications join u in _context.Users on ub.CompanyId equals u.CompanyId where ub.Name.ToLower() == ubication.ToLower() && u.Email.ToLower() == email.ToLower() select new { ub.Id, ub.CompanyId, ub.Name}).AnyAsync();
         }
-
-        // private async Task<List<Ubication>> GetUbication(string ubication, int company){
-        //     return await _context.Ubications.Where(u => u.CompanyId == company && u.Name.ToLower() == ubication.ToLower()).FirstAsync();
-        // }
 
         private async Task<bool> EquipmentExists(int id){
             return await _context.Equipments.AnyAsync(x => x.Id == id);

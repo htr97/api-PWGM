@@ -26,7 +26,7 @@ namespace Controllers
                 join e in _context.Equipments on m.EquipmentId equals e.Id
                 join u in _context.Ubications on e.UbicationId equals u.Id
                 join c in _context.Companies on u.CompanyId equals c.Id
-                join ur in _context.Users on c.Id equals ur.CompanyId
+                join ur in _context.Users on new {k1 = c.Id, k2 = m.User.Id} equals new {k1 = ur.CompanyId, k2 = ur.Id}
                 join p in _context.Priorities on m.PriorityId equals p.Id
                 join pr in _context.Problems on m.ProblemId equals pr.Id
                 join mt in _context.MaintenanceTypes on m.MaintenanceTypeId equals mt.Id
@@ -40,25 +40,25 @@ namespace Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("company/{id}")]
-        public async Task<List<GetMaintenanceDto>> GetMaintenanceByCompanyId(int id){
+        [HttpGet("company/{email}")]
+        public async Task<List<GetMaintenanceDto>> GetMaintenanceByCompanyId(string email){
             return await (from m in _context.Maintenances
                 join e in _context.Equipments on m.EquipmentId equals e.Id
                 join u in _context.Ubications on e.UbicationId equals u.Id
                 join c in _context.Companies on u.CompanyId equals c.Id
-                join ur in _context.Users on c.Id equals ur.CompanyId
+                join ur in _context.Users on new {k1 = c.Id, k2 = m.User.Id} equals new {k1 = ur.CompanyId, k2 = ur.Id}
                 join p in _context.Priorities on m.PriorityId equals p.Id
                 join pr in _context.Problems on m.ProblemId equals pr.Id
                 join mt in _context.MaintenanceTypes on m.MaintenanceTypeId equals mt.Id
-                where c.Id == id 
-                select new GetMaintenanceDto {DeviceName = e.DeviceName, StartDate = m.StartDate, EndDate = m.EndDate, UserName = u.Name, Company = c.Name, Priority = p.Description, Problem = pr.Description, MaintenanceType = mt.Name, Description = m.Description}).ToListAsync().ConfigureAwait(false);
+                where ur.Email == email
+                select new GetMaintenanceDto {Id = m.Id, DeviceName = e.DeviceName, StartDate = m.StartDate, EndDate = m.EndDate, UserName = ur.UserName, Company = c.Name, Priority = p.Description, Problem = pr.Name, MaintenanceType = mt.Name, Description = m.Description}).ToListAsync().ConfigureAwait(false);
         }
 
         [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult> PostMaintenance(PostMaintenanceDto maintenanceDto)
         {
-            if (await EquipmentExists(maintenanceDto.EquipmentId))
+            if (!await EquipmentExists(maintenanceDto.EquipmentId))
             {
                 return BadRequest();
             }
@@ -70,7 +70,7 @@ namespace Controllers
                 Description = maintenanceDto.Description,
                 MaintenanceTypeId = maintenanceDto.MaintenanceTypeId,
                 PriorityId = maintenanceDto.PriorityId,
-                User = await _context.Users.Where(u => u.Id == maintenanceDto.UserId).FirstAsync(),
+                User = await _context.Users.Where(u => u.Email == maintenanceDto.UserEmail).FirstAsync(),
                 ProblemId = maintenanceDto.ProblemId,
                 EquipmentId = maintenanceDto.EquipmentId
             };

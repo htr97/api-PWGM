@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Entities
+namespace DTOs
 {
-    public class Problem
+    public class PostProblemDto
     {
-        public int Id { get; set; }
-        
         [Required]
         [MaxLength(50)]
         public string Name { get; set; }
@@ -13,7 +11,7 @@ namespace Entities
         [Required]
         [MaxLength(160)]
         public string Description { get; set; }
-        public Company Company {get; set;}
-        
+
+        public string UserEmail { get; set; }
     }
 }

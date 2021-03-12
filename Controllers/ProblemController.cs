@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Data;
+using DTOs;
 using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,10 +25,27 @@ namespace Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("company/{email}")]
+        public async Task<ActionResult<IEnumerable<Problem>>> GetProblemsByCompanyId(string email){
+            return await _context.Problems.FromSqlRaw("Select * FROM dbo.Problems WHERE CompanyId = (Select CompanyId from dbo.Users where LOWER(Email) = LOWER({0}))", email).ToListAsync();
+        }
+
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> PostProblem(Problem problem)
+        public async Task<IActionResult> PostProblem(PostProblemDto problem)
         {
-            _context.Problems.Add(problem);
+
+            var user = await _context.Users.Where(u => u.Email.ToLower() == problem.UserEmail.ToLower()).FirstAsync();
+            var company = await _context.Companies.Where(c => c.Id == user.CompanyId).FirstAsync();
+
+            var x = new Problem
+            {
+                Name = problem.Name,
+                Description = problem.Description,
+                Company = company
+            };
+
+            _context.Problems.Add(x);
             await _context.SaveChangesAsync();
 
             return Ok();
