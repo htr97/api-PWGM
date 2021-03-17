@@ -30,7 +30,7 @@ namespace Controllers
                 join p in _context.Priorities on m.PriorityId equals p.Id
                 join pr in _context.Problems on m.ProblemId equals pr.Id
                 join mt in _context.MaintenanceTypes on m.MaintenanceTypeId equals mt.Id
-                select new GetMaintenanceDto {DeviceName = e.DeviceName, StartDate = m.StartDate, EndDate = m.EndDate, UserName = u.Name, Company = c.Name, Priority = p.Description, Problem = pr.Description, MaintenanceType = mt.Name, Description = m.Description}).ToListAsync().ConfigureAwait(false);
+                select new GetMaintenanceDto {DeviceName = e.DeviceName, StartDate = m.StartDate, EndDate = m.EndDate, UserName = ur.UserName, Company = c.Name, Priority = p.Description, Problem = pr.Description, MaintenanceType = mt.Name, Description = m.Description}).ToListAsync().ConfigureAwait(false);
         }
 
         [AllowAnonymous]
@@ -94,6 +94,45 @@ namespace Controllers
 
             return Ok();
         }
+
+        //
+        [AllowAnonymous]
+        [HttpPost("maintenance")]
+        public async Task<IActionResult> UpdateMaintenance(UpdateMaintenanceDto maintenance)
+        {
+            
+            if (!await MaintenanceExists(maintenance.Id))
+            {
+                return BadRequest();
+            }
+
+            // if(id != maintenance.Id){
+            //     return BadRequest();
+            // }
+
+            var maint = new Maintenance 
+            {
+                Id = maintenance.Id,
+                StartDate = maintenance.StartDate,
+                EndDate = maintenance.EndDate,
+                Description = maintenance.Description,
+                MaintenanceTypeId = maintenance.MaintenanceTypeId,
+                PriorityId = maintenance.PriorityId,
+                ProblemId = maintenance.ProblemId
+            };
+
+            _context.Maintenances.Attach(maint);
+            // _context.Entry(maint).State = EntityState.Modified;
+            _context.Entry(maint).Property(x => x.StartDate).IsModified = true;
+            _context.Entry(maint).Property(x => x.EndDate).IsModified = true;
+            _context.Entry(maint).Property(x => x.Description).IsModified = true;
+            _context.Entry(maint).Property(x => x.MaintenanceTypeId).IsModified = true;
+            _context.Entry(maint).Property(x => x.PriorityId).IsModified = true;
+            _context.Entry(maint).Property(x => x.ProblemId).IsModified = true;
+            _context.SaveChanges();
+
+            return Ok();
+        }
         
         //api/equipment/id
         [AllowAnonymous]
@@ -114,6 +153,10 @@ namespace Controllers
 
         private async Task<bool> EquipmentExists(int id){
             return await _context.Equipments.AnyAsync(x => x.Id == id);
+        }
+
+        private async Task<bool> MaintenanceExists(int id){
+            return await _context.Maintenances.AnyAsync(x => x.Id == id);
         }
     }
 }

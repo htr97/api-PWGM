@@ -33,6 +33,12 @@ namespace Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("code/{id}")]
+        public async Task<ActionResult<Equipment>> GetEquipmentById(int id){
+            return await _context.Equipments.FindAsync(id);
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<bool> PostEquipment(EquipmentDto equipmentDto)
         {
@@ -84,6 +90,44 @@ namespace Controllers
 
             _context.Entry(equipment).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("equipment")]
+        public async Task<IActionResult> UpdateEquipmente(UpdateEquipmenteDto equipment)
+        {
+            
+            if (!await EquipmentExists(equipment.Id))
+            {
+                return BadRequest();
+            }
+
+            var _equipment = new Equipment
+            {
+                Id = equipment.Id,
+                DeviceName = equipment.DeviceName,
+                SystemType = equipment.SystemType,
+                StorageType = equipment.StorageType,
+                StorageCap = equipment.StorageCap,
+                Processor = equipment.Processor,
+                Memory = equipment.Memory,
+                Observation = equipment.Observation,
+                UbicationId = equipment.UbicationId
+            };
+
+            _context.Equipments.Attach(_equipment);
+            // _context.Entry(maint).State = EntityState.Modified;
+            _context.Entry(_equipment).Property(x => x.DeviceName).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.SystemType).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.StorageType).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.StorageCap).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.Processor).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.Memory).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.Observation).IsModified = true;
+            _context.Entry(_equipment).Property(x => x.UbicationId).IsModified = true;
+            _context.SaveChanges();
 
             return Ok();
         }
