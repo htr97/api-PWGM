@@ -6,7 +6,9 @@ namespace DTOs
     public class UpdateUserDto
     {
         [Required]
-        public string UserName{ get; set; }
+        public string FirstName{ get; set; }
+        [Required]
+        public string LastName{ get; set; }
         [Required]
         public DateTime DateofBirth { get; set; }
 
@@ -19,6 +21,5 @@ namespace DTOs
 
         [StringLength(15)]
         public string Telephone { get; set; }
-        public string Photo { get; set; }
     }
 }

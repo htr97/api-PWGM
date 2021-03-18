@@ -129,7 +129,7 @@ namespace Controllers
             _context.Entry(maint).Property(x => x.MaintenanceTypeId).IsModified = true;
             _context.Entry(maint).Property(x => x.PriorityId).IsModified = true;
             _context.Entry(maint).Property(x => x.ProblemId).IsModified = true;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok();
         }
