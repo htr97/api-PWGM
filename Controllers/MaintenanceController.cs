@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DTOs;
+using System.Globalization;
 
 namespace Controllers
 {
@@ -42,16 +43,70 @@ namespace Controllers
         [AllowAnonymous]
         [HttpGet("company/{email}")]
         public async Task<List<GetMaintenanceDto>> GetMaintenanceByCompanyId(string email){
+            var user = await (from u in _context.Users where u.Email == email select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId, UserName = u.UserName}).FirstOrDefaultAsync().ConfigureAwait(false);
+
             return await (from m in _context.Maintenances
                 join e in _context.Equipments on m.EquipmentId equals e.Id
                 join u in _context.Ubications on e.UbicationId equals u.Id
                 join c in _context.Companies on u.CompanyId equals c.Id
-                join ur in _context.Users on new {k1 = c.Id, k2 = m.User.Id} equals new {k1 = ur.CompanyId, k2 = ur.Id}
+                join ur in _context.Users on new {k1 = c.Id, k2 = m.UserId} equals new {k1 = ur.CompanyId, k2 = ur.Id}
                 join p in _context.Priorities on m.PriorityId equals p.Id
                 join pr in _context.Problems on m.ProblemId equals pr.Id
                 join mt in _context.MaintenanceTypes on m.MaintenanceTypeId equals mt.Id
-                where ur.Email == email
+                where c.Id == user.CompanyId
                 select new GetMaintenanceDto {Id = m.Id, DeviceName = e.DeviceName, StartDate = m.StartDate, EndDate = m.EndDate, UserName = ur.UserName, Company = c.Name, Priority = p.Description, Problem = pr.Name, MaintenanceType = mt.Name, Description = m.Description}).ToListAsync().ConfigureAwait(false);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("preventive/{email}")]
+        public async Task<List<MaintenanceTypeRDto>> GetPreventiveResumeByCompany(string email){
+            var user = await (from u in _context.Users where u.Email.ToLower() == email.ToLower() select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId}).FirstOrDefaultAsync().ConfigureAwait(false);
+
+            // var resume = await _context.Maintenances.FromSqlRaw("SELECT COUNT(*) Total, FORMAT(StartDate, 'MMMM') Mes FROM dbo.Maintenances WHERE MaintenanceTypeId=2 AND UserId IN (SELECT id from dbo.Users where CompanyId = {0}) GROUP BY FORMAT(StartDate, 'MMMM')", user.CompanyId).ToListAsync();
+
+            var dateTimeInfo = new DateTimeFormatInfo();
+
+            var result = (from m in _context.Maintenances 
+                join ur in _context.Users on m.UserId equals  ur.Id
+                join c in _context.Companies on ur.CompanyId equals c.Id
+                where m.MaintenanceTypeId == 2 && c.Id == user.CompanyId
+                group m by m.StartDate.Month into r
+                select new MaintenanceTypeRDto { Mes = dateTimeInfo.GetMonthName(r.Key), Total = r.Count()} ).ToListAsync();
+                // r.Key.ToString("MMMM") ,Total = r.Count()} ).ToListAsync();
+
+            return await result; 
+        }
+
+        [AllowAnonymous]
+        [HttpGet("corrective/{email}")]
+        public async Task<List<MaintenanceTypeRDto>> GetCorrectiveResumeByCompany(string email){
+            var user = await (from u in _context.Users where u.Email.ToLower() == email.ToLower() select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId}).FirstOrDefaultAsync().ConfigureAwait(false);
+
+            var dateTimeInfo = new DateTimeFormatInfo();
+
+            var result = (from m in _context.Maintenances 
+                join ur in _context.Users on m.UserId equals  ur.Id
+                join c in _context.Companies on ur.CompanyId equals c.Id
+                where m.MaintenanceTypeId == 1 && c.Id == user.CompanyId
+                group m by m.StartDate.Month into r
+                select new MaintenanceTypeRDto { Mes = dateTimeInfo.GetMonthName(r.Key), Total = r.Count()} ).ToListAsync();
+
+            return await result; 
+        }
+
+        [AllowAnonymous]
+        [HttpGet("resume/{email}")]
+        public async Task<List<MaintenanceResumeDto>> GetMaintenanceResumeByCompany(string email){
+            var user = await (from u in _context.Users where u.Email == email select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId}).FirstOrDefaultAsync().ConfigureAwait(false);
+
+            var result = (from m in _context.Maintenances 
+                join ur in _context.Users on m.UserId equals  ur.Id
+                join c in _context.Companies on ur.CompanyId equals c.Id
+                where c.Id == user.CompanyId
+                group m by m.MaintenanceTypeId into r 
+                select new MaintenanceResumeDto { MaintenanceTypeId = r.Key ,Total = r.Count() } ).ToListAsync();
+
+            return await result; 
         }
 
         [AllowAnonymous]
