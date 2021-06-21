@@ -40,5 +40,7 @@ namespace DTOs
         public string Ubication { get; set; }
 
         public string UserEmail { get; set; }
+
+        public int Garantia { get; set; }
     }
 }

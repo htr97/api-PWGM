@@ -70,7 +70,8 @@ namespace Controllers
                     Memory = equipmentDto.Memory,
                     OsName = equipmentDto.OsName,
                     Observation = equipmentDto.Observation,
-                    UbicationId = uid.Id
+                    UbicationId = uid.Id,
+                    Garantia = equipmentDto.Garantia
                 };
 
                 _context.Equipments.Add(equipment);

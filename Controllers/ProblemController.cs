@@ -24,13 +24,13 @@ namespace Controllers
             return await _context.Problems.ToListAsync();   
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("company/{email}")]
         public async Task<ActionResult<IEnumerable<Problem>>> GetProblemsByCompanyId(string email){
             return await _context.Problems.FromSqlRaw("Select * FROM dbo.Problems WHERE CompanyId = (Select CompanyId from dbo.Users where LOWER(Email) = LOWER({0}))", email).ToListAsync();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostProblem(PostProblemDto problem)
         {
@@ -51,7 +51,7 @@ namespace Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProblem(int id, Problem problem)
         {
@@ -66,7 +66,7 @@ namespace Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProblem(int id){
             

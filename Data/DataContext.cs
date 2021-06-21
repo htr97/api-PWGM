@@ -17,5 +17,6 @@ namespace Data
         public DbSet<Priority> Priorities {get; set;}
         public DbSet<Maintenance> Maintenances {get; set;}
         public DbSet<Equipment> Equipments { get; set; }
-    }
+        public DbSet<Payment> Payments { get; set; }
+    } 
 }

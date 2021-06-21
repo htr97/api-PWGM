@@ -57,7 +57,7 @@ namespace Controllers
                 select new GetMaintenanceDto {Id = m.Id, DeviceName = e.DeviceName, StartDate = m.StartDate, EndDate = m.EndDate, UserName = ur.UserName, Company = c.Name, Priority = p.Description, Problem = pr.Name, MaintenanceType = mt.Name, Description = m.Description}).ToListAsync().ConfigureAwait(false);
         }
 
-        [AllowAnonymous]
+        
         [HttpGet("preventive/{email}")]
         public async Task<List<MaintenanceTypeRDto>> GetPreventiveResumeByCompany(string email){
             var user = await (from u in _context.Users where u.Email.ToLower() == email.ToLower() select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId}).FirstOrDefaultAsync().ConfigureAwait(false);
@@ -77,7 +77,20 @@ namespace Controllers
             return await result; 
         }
 
-        [AllowAnonymous]
+        [HttpGet("mdates/{email}")]
+        public async Task<List<MaintenanceDatesDto>> GetResumeByCompany(string email){
+            var user = await (from u in _context.Users where u.Email == email select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId, UserName = u.UserName}).FirstOrDefaultAsync().ConfigureAwait(false);
+
+            return await (from m in _context.Maintenances
+                join e in _context.Equipments on m.EquipmentId equals e.Id
+                join u in _context.Ubications on e.UbicationId equals u.Id
+                join c in _context.Companies on u.CompanyId equals c.Id
+                where c.Id == user.CompanyId
+                orderby m.StartDate
+                select new MaintenanceDatesDto {title = e.DeviceName, start = m.StartDate.ToString("yyyy-MM-dd"), end = m.EndDate.ToString("yyyy-MM-dd")}).ToListAsync().ConfigureAwait(false);
+        }
+
+        
         [HttpGet("corrective/{email}")]
         public async Task<List<MaintenanceTypeRDto>> GetCorrectiveResumeByCompany(string email){
             var user = await (from u in _context.Users where u.Email.ToLower() == email.ToLower() select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId}).FirstOrDefaultAsync().ConfigureAwait(false);
@@ -94,7 +107,7 @@ namespace Controllers
             return await result; 
         }
 
-        [AllowAnonymous]
+        
         [HttpGet("resume/{email}")]
         public async Task<List<MaintenanceResumeDto>> GetMaintenanceResumeByCompany(string email){
             var user = await (from u in _context.Users where u.Email == email select new GetUserDto { Id = u.Id, CompanyId = u.CompanyId}).FirstOrDefaultAsync().ConfigureAwait(false);

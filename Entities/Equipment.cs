@@ -38,6 +38,8 @@ namespace Entities
         [Required]
         [MaxLength (160)]
         public string Observation { get; set; }
+
+        public int Garantia { get; set; }
         public Ubication Ubication { get; set; }
         public int UbicationId { get; set; }
 
